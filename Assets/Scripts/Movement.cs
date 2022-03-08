@@ -31,6 +31,13 @@ public class Movement : MonoBehaviour
         {
             myRigidbody.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
         }
+        if (myFeet.IsTouchingLayers(ground)) {
+            animator.SetBool("isTouchingGround", true);
+        } 
+        else
+        {
+            animator.SetBool("isTouchingGround", false);
+        }
     }
     private void FixedUpdate()
     {
