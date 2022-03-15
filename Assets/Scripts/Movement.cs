@@ -10,6 +10,8 @@ public class Movement : MonoBehaviour
 
     private LayerMask ground;
 
+    public int facing = 1;
+
     private float speed = 5f;
     private float horizontalMovement = 0f;
     private float jumpForce = 7f;
