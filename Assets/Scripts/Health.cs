@@ -30,6 +30,21 @@ public class Health : MonoBehaviour
         }
     }
 
+    public void TakeDamage(float damageTaken)
+    {
+        if (!isHit)
+        {
+            if (GetComponent<Fight>().blockCheck)
+            {
+                currentHealth -= damageTaken / 2;
+            } else
+            {
+                currentHealth -= damageTaken;
+                StartCoroutine(KnockBack());
+            }
+        }
+    }
+
     private void Die()
     {
         animator.SetTrigger("die");

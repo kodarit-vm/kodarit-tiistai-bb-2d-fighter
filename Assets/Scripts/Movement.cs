@@ -44,6 +44,6 @@ public class Movement : MonoBehaviour
     private void FixedUpdate()
     {
         myRigidbody.velocity = new Vector2(horizontalMovement * speed, myRigidbody.velocity.y);
-        animator.SetFloat("speed", horizontalMovement);
+        animator.SetFloat("speed", Mathf.Abs(horizontalMovement));
     }
 }
