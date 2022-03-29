@@ -44,6 +44,39 @@ public class Fight : MonoBehaviour
                 Kick();
             }
         }
+
+        if (attacking)
+        {
+            if (coolDownTimer > 0)
+            {
+                coolDownTimer -= Time.deltaTime;
+            } else
+            {
+                attacking = false;
+            }
+        }
+
+        if (Input.GetButtonDown("Fire3"))
+        {
+            StartBlock();
+        }
+
+        if (Input.GetButtonUp("Fire3"))
+        {
+            EndBlock();
+        }
+    }
+
+    private void EndBlock()
+    {
+        animator.SetBool("block", false);
+        blockCheck = false;
+    }
+
+    private void StartBlock()
+    {
+        animator.SetBool("block", true);
+        blockCheck = true;
     }
 
     private void Kick()
@@ -56,7 +89,7 @@ public class Fight : MonoBehaviour
         {
             animator.SetTrigger("kick2");
         }
-
+        Attack(kickCheck, kickDamage);
     }
 
     private void Punch()
@@ -69,7 +102,29 @@ public class Fight : MonoBehaviour
         {
             animator.SetTrigger("punch2");
         }
+        Attack(punchCheck, punchDamage);
+    }
 
+    private void Attack(Transform check, float damage)
+    {
+        Collider2D[] enemyHit = Physics2D.OverlapCircleAll(check.position, range, enemyLayer);
+        if (enemyHit != null)
+        {
+            foreach(Collider2D enemy in enemyHit)
+            {
+                if (!hit)
+                {
+                    if (enemy.gameObject != this.gameObject)
+                    {
+                        enemy.GetComponent<Health>().TakeDamage(damage);
+                        hit = true;
+                    }
+                }
+            }
+            hit = false;
+        }
+        attacking = true;
+        coolDownTimer = coolDown;
     }
 
     private void OnDrawGizmosSelected()

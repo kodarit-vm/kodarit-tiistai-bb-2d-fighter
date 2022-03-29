@@ -6,7 +6,7 @@ using UnityEngine;
 public class Health : MonoBehaviour
 {
     private float maxHealth = 100f;
-    private float currentHealth;
+    public float currentHealth;
 
     private float hitTimer = 0.15f;
     private bool isHit = false;
