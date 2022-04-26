@@ -3,13 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
 public class Health : MonoBehaviour
 {
+    PhotonView view;
+
     private float maxHealth = 100f;
     public float currentHealth;
 
     private float hitTimer = 0.15f;
-    private bool isHit = false;
+    public bool isHit = false;
 
     private Animator animator;
     private Rigidbody2D myRigidBody;
@@ -19,6 +22,7 @@ public class Health : MonoBehaviour
         animator = GetComponent<Animator>();
         myRigidBody = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
+        view = GetComponent<PhotonView>();
     }
 
     // Update is called once per frame
@@ -30,6 +34,7 @@ public class Health : MonoBehaviour
         }
     }
 
+    [PunRPC]
     public void TakeDamage(float damageTaken)
     {
         if (!isHit)
@@ -42,6 +47,17 @@ public class Health : MonoBehaviour
                 currentHealth -= damageTaken;
                 StartCoroutine(KnockBack());
             }
+        }
+    }
+
+    public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(currentHealth);
+        } else if (stream.IsReading)
+        {
+            currentHealth = (float)stream.ReceiveNext();
         }
     }
 

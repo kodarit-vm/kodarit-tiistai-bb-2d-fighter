@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
 public class Fight : MonoBehaviour
 {
+    PhotonView view;
     private Animator animator;
 
     public bool blockCheck = false;
@@ -28,42 +30,48 @@ public class Fight : MonoBehaviour
     {
         enemyLayer = LayerMask.GetMask("Default");
         animator = GetComponent<Animator>();
+        view = GetComponent<PhotonView>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!blockCheck && !attacking && coolDownTimer <= 0)
+        bool isHit = GetComponent<Health>().isHit;
+        if (view.IsMine && !isHit)
         {
-            if (Input.GetButtonDown("Fire1"))
+            if (!blockCheck && !attacking && coolDownTimer <= 0)
             {
-                Punch();
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    Punch();
+                }
+                if (Input.GetButtonDown("Fire2"))
+                {
+                    Kick();
+                }
             }
-            if (Input.GetButtonDown("Fire2"))
+
+            if (attacking)
             {
-                Kick();
+                if (coolDownTimer > 0)
+                {
+                    coolDownTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    attacking = false;
+                }
             }
-        }
 
-        if (attacking)
-        {
-            if (coolDownTimer > 0)
+            if (Input.GetButtonDown("Fire3"))
             {
-                coolDownTimer -= Time.deltaTime;
-            } else
-            {
-                attacking = false;
+                StartBlock();
             }
-        }
 
-        if (Input.GetButtonDown("Fire3"))
-        {
-            StartBlock();
-        }
-
-        if (Input.GetButtonUp("Fire3"))
-        {
-            EndBlock();
+            if (Input.GetButtonUp("Fire3"))
+            {
+                EndBlock();
+            }
         }
     }
 
@@ -116,7 +124,8 @@ public class Fight : MonoBehaviour
                 {
                     if (enemy.gameObject != this.gameObject)
                     {
-                        enemy.GetComponent<Health>().TakeDamage(damage);
+                        enemy.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.All, damage);
+    //                    enemy.GetComponent<Health>().TakeDamage(damage);
                         hit = true;
                     }
                 }
